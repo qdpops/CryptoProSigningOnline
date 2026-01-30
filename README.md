@@ -40,11 +40,7 @@ git clone https://github.com/qdpops/CryptoProSigningOnline.git
 cd CryptoProSigningOnline
 ```
 
-2. Откройте файл `index.html` в браузере:
-```bash
-# Или просто дважды кликните по файлу
-open index.html
-```
+2. Для работы требуется веб сервер с защищенным соединением
 
 **Готово!** Сервис работает полностью автономно, без необходимости в веб-сервере.
 
