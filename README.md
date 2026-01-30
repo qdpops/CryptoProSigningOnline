@@ -40,10 +40,10 @@ git clone https://github.com/qdpops/CryptoProSigningOnline.git
 cd CryptoProSigningOnline
 ```
 
-2. Откройте файл `document-signer.html` в браузере:
+2. Откройте файл `index.html` в браузере:
 ```bash
 # Или просто дважды кликните по файлу
-open document-signer.html
+open index.html
 ```
 
 **Готово!** Сервис работает полностью автономно, без необходимости в веб-сервере.
