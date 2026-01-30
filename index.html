@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписание документа ЭЦП</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        #status {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        #cert-container {
+            display: grid;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        #cert-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #cert-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #cert-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .cert-item {
+            cursor: pointer;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .cert-item:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .cert-item.selected {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .cert-item strong {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .cert-item small {
+            display: block;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .cert-invalid {
+            color: #dc3545 !important;
+            font-weight: 500;
+        }
+
+        .options {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+            transition: color 0.2s;
+        }
+
+        .options label:hover {
+            color: #667eea;
+        }
+
+        .options input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .options select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .options select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .select-wrapper {
+            margin-top: 8px;
+        }
+
+        .select-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        #drop-area {
+            border: 3px dashed #d0d0d0;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            cursor: pointer;
+        }
+
+        #drop-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        #drop-area.highlight {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            transform: scale(1.02);
+        }
+
+        #drop-area i {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .drop-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .drop-subtext {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .file-label {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .file-label:hover {
+            color: #764ba2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            min-width: 140px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: linear-gradient(135deg, #cccccc 0%, #999999 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        #download-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        #download-button:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        #reset-button {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        #reset-button:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+
+        #result.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        #result.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        details {
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 6px;
+            font-weight: 500;
+            color: #495057;
+            user-select: none;
+        }
+
+        summary:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        details pre {
+            margin-top: 10px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 11px;
+            border: 1px solid #dee2e6;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .info-item i {
+            color: #667eea;
+            width: 16px;
+        }
+
+        .info-item strong {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: 100%;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #cert-container {
+                max-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-file-signature"></i>
+                <span>Подписание документа ЭЦП</span>
+            </h1>
+            <p>Криптографическая защита документов с использованием электронной цифровой подписи</p>
+        </div>
+
+        <div class="content">
+            <div id="status" class="status-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Загрузка плагина КриптоПро...</span>
+            </div>
+
+            <div id="cert-list" class="section hidden">
+                <div class="section-title">
+                    <i class="fas fa-certificate"></i>
+                    <span>Доступные сертификаты</span>
+                </div>
+                <div id="cert-container"></div>
+            </div>
+
+            <div class="options section hidden" id="options">
+                <div class="section-title">
+                    <i class="fas fa-cog"></i>
+                    <span>Параметры подписи</span>
+                </div>
+                <div style="background: #e7f3ff; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #004085; border-left: 3px solid #0066cc;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Совет:</strong> После подписания вам будет предложено выбрать место для сохранения файла подписи. Рекомендуем сохранить его рядом с исходным документом.
+                </div>
+                <label>
+                    <input type="checkbox" id="use-tsa" checked>
+                    <span>Использовать метку времени (TSA)</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="detached-signature" checked>
+                    <span>Отсоединенная подпись</span>
+                </label>
+                <div class="select-wrapper">
+                    <span class="select-label">Тип подписи:</span>
+                    <select id="signature-type">
+                        <option value="1">CAdES-BES (базовая электронная подпись)</option>
+                        <option value="2">CAdES-X Long Type 1 (расширенная подпись)</option>
+                        <option value="3">CAdES-T (подпись с меткой времени)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="drop-area" class="section hidden">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="drop-text">
+                    Перетащите файл сюда или кликните для выбора
+                </div>
+                <div class="drop-subtext">Поддерживаются все типы файлов</div>
+                <input type="file" id="file-input" style="display: none;">
+            </div>
+
+            <div id="actions" class="actions hidden">
+                <button id="sign-button" disabled>
+                    <i class="fas fa-pen-nib"></i>
+                    <span>Подписать документ</span>
+                </button>
+                <button id="download-button" class="hidden">
+                    <i class="fas fa-download"></i>
+                    <span>Скачать подпись</span>
+                </button>
+                <button id="reset-button" class="hidden">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Подписать еще</span>
+                </button>
+            </div>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script language="javascript" src="https://cryptopro.ru/sites/default/files/products/cades/cadesplugin_api.js"></script>
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const signButton = document.getElementById('sign-button');
+        const downloadButton = document.getElementById('download-button');
+        const resetButton = document.getElementById('reset-button');
+        const resultDiv = document.getElementById('result');
+        const statusDiv = document.getElementById('status');
+        const certContainer = document.getElementById('cert-container');
+        const certListDiv = document.getElementById('cert-list');
+        const optionsDiv = document.getElementById('options');
+        const actionsDiv = document.getElementById('actions');
+        const useTsaCheckbox = document.getElementById('use-tsa');
+        const detachedSignatureCheckbox = document.getElementById('detached-signature');
+        const signatureTypeSelect = document.getElementById('signature-type');
+
+        let selectedFile = null;
+        let certificates = [];
+        let selectedCertIndex = null;
+        let generatedSignature = null;
+        let signedDocumentsCount = 0;
+
+        window.onload = async () => {
+            try {
+                await checkCadesPlugin();
+                updateStatus('success', 'Плагин КриптоПро загружен успешно', 'check-circle');
+                await loadCertificates();
+                certListDiv.classList.remove('hidden');
+                optionsDiv.classList.remove('hidden');
+            } catch (error) {
+                updateStatus('error', `Ошибка инициализации плагина: ${error.message}`, 'exclamation-circle');
+            }
+        };
+
+        function updateStatus(type, message, icon) {
+            statusDiv.className = `status-${type}`;
+            statusDiv.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        }
+
+        function checkCadesPlugin() {
+            return new Promise((resolve, reject) => {
+                if (!window.cadesplugin) {
+                    reject(new Error('КриптоПро ЭЦП Browser plug-in не обнаружен. Установите плагин с сайта cryptopro.ru'));
+                    return;
+                }
+
+                cadesplugin.then(() => {
+                    resolve();
+                }).catch(error => {
+                    reject(new Error('Ошибка загрузки плагина: ' + error.message));
+                });
+            });
+        }
+
+        async function loadCertificates() {
+            certificates = [];
+            certContainer.innerHTML = '';
+
+            const oStore = await cadesplugin.CreateObjectAsync("CAdESCOM.Store");
+            try {
+                await oStore.Open(
+                    cadesplugin.CADESCOM_CONTAINER_STORE,
+                    cadesplugin.CAPICOM_MY_STORE,
+                    cadesplugin.CAPICOM_STORE_OPEN_MAXIMUM_ALLOWED);
+
+                const oCertificates = await oStore.Certificates;
+                const count = await oCertificates.Count;
+                if (count === 0) {
+                    throw new Error('Нет доступных сертификатов');
+                }
+
+                for (let i = 1; i <= count; i++) {
+                    const cert = await oCertificates.Item(i);
+                    try {
+                        const pKey = await cert.PrivateKey;
+                        const subjectName = await cert.SubjectName;
+                        const validTo = await cert.ValidToDate;
+                        const validFrom = await cert.ValidFromDate;
+                        
+                        certificates.push({ cert, subjectName, validTo, validFrom });
+
+                        const certItem = document.createElement('div');
+                        certItem.className = 'cert-item';
+                        certItem.dataset.index = i - 1;
+                        
+                        const validToDate = new Date(validTo);
+                        const validFromDate = new Date(validFrom);
+                        const isValid = new Date() >= validFromDate && new Date() <= validToDate;
+                        
+                        certItem.innerHTML = `
+                            <strong><i class="fas fa-certificate" style="color: #667eea; margin-right: 8px;"></i>${extractCN(subjectName)}</strong>
+                            <small>${subjectName}</small>
+                            <small><i class="far fa-calendar-alt"></i> Действителен: ${validFromDate.toLocaleDateString('ru-RU')} - ${validToDate.toLocaleDateString('ru-RU')}</small>
+                            ${!isValid ? '<small class="cert-invalid"><i class="fas fa-exclamation-triangle"></i> Сертификат недействителен</small>' : ''}
+                        `;
+                        certItem.addEventListener('click', () => selectCertificate(certItem));
+                        certContainer.appendChild(certItem);
+                    } catch (err) {
+                        console.warn(`Сертификат ${i} не имеет приватного ключа: ${err.message}`);
+                    }
+                }
+
+                if (certificates.length === 0) {
+                    throw new Error('Не найдено сертификатов с приватными ключами');
+                }
+            } finally {
+                await oStore.Close();
+            }
+        }
+
+        function extractCN(subjectName) {
+            const cnMatch = subjectName.match(/CN=([^,]+)/);
+            return cnMatch ? cnMatch[1] : subjectName;
+        }
+
+        function selectCertificate(certItem) {
+            const selectedIndex = parseInt(certItem.dataset.index, 10);
+            if (selectedCertIndex !== null) {
+                document.querySelector('.cert-item.selected')?.classList.remove('selected');
+            }
+            certItem.classList.add('selected');
+            selectedCertIndex = selectedIndex;
+            dropArea.classList.remove('hidden');
+            actionsDiv.classList.remove('hidden');
+        }
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        // Добавляем клик по всей области для выбора файла
+        dropArea.addEventListener('click', (e) => {
+            // Не открываем диалог, если кликнули на label
+            if (e.target.tagName !== 'LABEL') {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            handleFiles(fileInput.files);
+        });
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                selectedFile = files[0];
+                dropArea.innerHTML = `
+                    <i class="fas fa-file-alt" style="color: #28a745;"></i>
+                    <div class="drop-text"><strong>Выбранный файл:</strong> ${selectedFile.name}</div>
+                    <div class="drop-subtext">Размер: ${formatFileSize(selectedFile.size)}</div>
+                `;
+                signButton.disabled = false;
+            } else {
+                selectedFile = null;
+                resetDropArea();
+                signButton.disabled = true;
+            }
+        }
+
+        function resetDropArea() {
+            dropArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="drop-text">
+                    Перетащите файл сюда или кликните для выбора
+                </div>
+                <div class="drop-subtext">Поддерживаются все типы файлов</div>
+            `;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' Б';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' КБ';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' МБ';
+        }
+
+        signButton.addEventListener('click', async () => {
+            if (!selectedFile || selectedCertIndex === null) {
+                alert('Выберите файл и сертификат для подписи');
+                return;
+            }
+
+            signButton.disabled = true;
+            signButton.innerHTML = '<span class="loading-spinner"></span><span>Создание подписи...</span>';
+            resultDiv.textContent = '';
+            resultDiv.className = '';
+
+            try {
+                const cert = certificates[selectedCertIndex].cert;
+                const fileContent = await readFileAsBase64(selectedFile);
+                
+                const useTsa = useTsaCheckbox.checked;
+                const detached = detachedSignatureCheckbox.checked;
+                const signatureType = parseInt(signatureTypeSelect.value);
+                
+                const signature = await SignCreate(cert, fileContent, useTsa, detached, signatureType);
+                generatedSignature = signature;
+                signedDocumentsCount++;
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <i class="fas fa-check-circle" style="font-size: 24px; color: #28a745;"></i>
+                        <strong style="font-size: 18px; color: #28a745;">Подпись успешно создана</strong>
+                        <span style="background: #28a745; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-left: auto;">
+                            Документ #${signedDocumentsCount}
+                        </span>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fas fa-file"></i>
+                            <span><strong>Файл:</strong> ${selectedFile.name}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Сертификат:</strong> ${extractCN(certificates[selectedCertIndex].subjectName)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span><strong>Тип:</strong> ${getSignatureTypeName(signatureType)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-link"></i>
+                            <span><strong>Отсоединенная:</strong> ${detached ? '<span class="badge badge-info">Да</span>' : '<span class="badge badge-success">Нет</span>'}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span><strong>Метка времени:</strong> ${useTsa ? '<span class="badge badge-success">Да</span>' : '<span class="badge badge-info">Нет</span>'}</span>
+                        </div>
+                    </div>
+                    <details style="margin-top: 15px;">
+                        <summary><i class="fas fa-code"></i> Показать подпись (Base64)</summary>
+                        <pre>${signature}</pre>
+                    </details>
+                `;
+                
+                downloadButton.classList.remove('hidden');
+                resetButton.classList.remove('hidden');
+                
+                downloadSignature();
+                
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <i class="fas fa-times-circle" style="font-size: 24px; color: #dc3545;"></i>
+                        <strong style="font-size: 18px; color: #dc3545;">Ошибка при создании подписи</strong>
+                    </div>
+                    <p style="color: #721c24;">${error.message}</p>
+                `;
+                console.error('Детали ошибки:', error);
+            } finally {
+                signButton.disabled = false;
+                signButton.innerHTML = '<i class="fas fa-pen-nib"></i><span>Подписать документ</span>';
+            }
+        });
+
+        function getSignatureTypeName(type) {
+            const types = {
+                1: 'CAdES-BES',
+                2: 'CAdES-X Long Type 1',
+                3: 'CAdES-T'
+            };
+            return types[type] || 'Неизвестный';
+        }
+
+        function SignCreate(cert, dataToSign, useTsa, detached, signatureType) {
+            return new Promise(function (resolve, reject) {
+                cadesplugin.async_spawn(function* (args) {
+                    try {
+                        var oSigner = yield cadesplugin.CreateObjectAsync("CAdESCOM.CPSigner");
+                        yield oSigner.propset_Certificate(args[2]);
+                        yield oSigner.propset_CheckCertificate(true);
+                        
+                        // ВАЖНО: Включаем всю цепочку сертификатов
+                        yield oSigner.propset_Options(cadesplugin.CAPICOM_CERTIFICATE_INCLUDE_WHOLE_CHAIN);
+                        
+                        if (args[4]) {
+                            try {
+                                yield oSigner.propset_TSAAddress("http://cryptopro.ru/tsp/");
+                            } catch (e) {
+                                console.warn('Не удалось установить TSA адрес, продолжаем без метки времени');
+                            }
+                        }
+
+                        var oSignedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.CadesSignedData");
+                        
+                        // ВАЖНО: Указываем, что контент в base64 формате
+                        yield oSignedData.propset_ContentEncoding(cadesplugin.CADESCOM_BASE64_TO_BINARY);
+                        yield oSignedData.propset_Content(args[3]);
+
+                        let cadesType;
+                        switch(args[6]) {
+                            case 1:
+                                cadesType = cadesplugin.CADESCOM_CADES_BES;
+                                break;
+                            case 2:
+                                cadesType = cadesplugin.CADESCOM_CADES_X_LONG_TYPE_1;
+                                break;
+                            case 3:
+                                cadesType = cadesplugin.CADESCOM_CADES_T;
+                                break;
+                            default:
+                                cadesType = cadesplugin.CADESCOM_CADES_BES;
+                        }
+
+                        var sSignedMessage;
+                        if (args[5]) {
+                            // Отсоединенная подпись
+                            sSignedMessage = yield oSignedData.SignCades(oSigner, cadesType, true);
+                        } else {
+                            // Присоединенная подпись
+                            sSignedMessage = yield oSignedData.SignCades(oSigner, cadesType, false);
+                        }
+                        
+                        args[0](sSignedMessage);
+                    } catch (e) {
+                        var err = cadesplugin.getLastError(e);
+                        console.error("Ошибка подписи:", err);
+                        args[1](new Error(err));
+                    }
+                }, resolve, reject, cert, dataToSign, useTsa, detached, signatureType);
+            });
+        }
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Получаем ArrayBuffer
+                    const arrayBuffer = reader.result;
+                    // Конвертируем в base64
+                    const bytes = new Uint8Array(arrayBuffer);
+                    let binary = '';
+                    for (let i = 0; i < bytes.byteLength; i++) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    const base64 = window.btoa(binary);
+                    resolve(base64);
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        async function downloadSignature() {
+            if (!generatedSignature) return;
+            
+            const signatureFileName = selectedFile.name + '.sig';
+            const signatureBlob = new Blob([generatedSignature], { type: 'application/octet-stream' });
+            
+            // Проверяем поддержку File System Access API
+            if ('showSaveFilePicker' in window) {
+                try {
+                    // Пытаемся сохранить файл с выбором места
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: signatureFileName,
+                        types: [{
+                            description: 'Файл подписи',
+                            accept: { 'application/octet-stream': ['.sig'] }
+                        }]
+                    });
+                    
+                    const writable = await handle.createWritable();
+                    await writable.write(signatureBlob);
+                    await writable.close();
+                    
+                    // Показываем уведомление об успешном сохранении
+                    showNotification('success', 'Файл подписи сохранен успешно!');
+                    return;
+                } catch (err) {
+                    // Пользователь отменил сохранение или произошла ошибка
+                    if (err.name !== 'AbortError') {
+                        console.error('Ошибка при сохранении:', err);
+                    }
+                    // Продолжаем стандартное скачивание
+                }
+            }
+            
+            // Стандартное скачивание (fallback)
+            const url = URL.createObjectURL(signatureBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = signatureFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('info', 'Файл подписи загружен в папку загрузок браузера');
+        }
+
+        function showNotification(type, message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 'linear-gradient(135deg, #17a2b8 0%, #138496 100%)'};
+                color: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                font-size: 14px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            const icon = type === 'success' ? 'check-circle' : 'info-circle';
+            notification.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Добавляем анимации для уведомлений
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(100px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        downloadButton.addEventListener('click', downloadSignature);
+
+        resetButton.addEventListener('click', () => {
+            // Сохраняем текущий выбранный сертификат
+            const currentCertIndex = selectedCertIndex;
+            
+            // Очищаем данные о файле и подписи
+            selectedFile = null;
+            generatedSignature = null;
+            
+            // Сбрасываем состояние кнопок
+            signButton.disabled = true;
+            downloadButton.classList.add('hidden');
+            resetButton.classList.add('hidden');
+            
+            // Очищаем результат
+            resultDiv.innerHTML = '';
+            resultDiv.className = '';
+            
+            // Очищаем input и восстанавливаем drop area
+            fileInput.value = '';
+            resetDropArea();
+            
+            // Показываем уведомление
+            showNotification('info', 'Готово к подписанию нового документа');
+            
+            // Сохраняем выбор сертификата (не сбрасываем)
+            // selectedCertIndex остается тем же
+        });
+    </script>
+</body>
+</html>
